@@ -147,8 +147,7 @@ static void ReadSourceTargetBuild(const std::map<std::string, std::string>& meta
 // Checks the build version, fingerprint and timestamp in the metadata of the A/B package.
 // Downgrading is not allowed unless explicitly enabled in the package and only for
 // incremental packages.
-static bool CheckAbSpecificMetadata(const std::map<std::string, std::string>& metadata,
-                                    RecoveryUI* ui) {
+static bool CheckAbSpecificMetadata(const std::map<std::string, std::string>& metadata) {
   // Incremental updates should match the current build.
   auto device_pre_build = android::base::GetProperty("ro.build.version.incremental", "");
   auto pkg_pre_build = get_value(metadata, "pre-build-incremental");
@@ -168,7 +167,7 @@ static bool CheckAbSpecificMetadata(const std::map<std::string, std::string>& me
   }
 
   // Check for downgrade version.
-/*  bool undeclared_downgrade = false;
+  /*bool undeclared_downgrade = false;
   int64_t build_timestamp =
       android::base::GetIntProperty("ro.build.date.utc", std::numeric_limits<int64_t>::max());
   int64_t pkg_post_timestamp = 0;
@@ -188,12 +187,12 @@ static bool CheckAbSpecificMetadata(const std::map<std::string, std::string>& me
       LOG(ERROR) << "Downgrade package must have a pre-build version set, not allowed.";
       undeclared_downgrade = true;
     }
-  }*/
+  }
 
   if (undeclared_downgrade &&
       !(ui->IsTextVisible() && ask_to_continue_downgrade(ui->GetDevice()))) {
     return false;
-  }
+  }*/
 
   return true;
 }
@@ -239,8 +238,8 @@ bool CheckPackageMetadata(const std::map<std::string, std::string>& metadata, Ot
     }
   }
 
-  if (ota_type == OtaType::AB) {
-    return CheckAbSpecificMetadata(metadata, ui);
+  if (ota_type == OtaType::AB && ui) {
+    return CheckAbSpecificMetadata(metadata);
   }
 
   return true;
